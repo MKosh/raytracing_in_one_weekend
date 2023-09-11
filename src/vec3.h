@@ -1,16 +1,20 @@
 #pragma once
 
+// #include <__concepts/arithmetic.h>
 #include <cmath>
 #include <concepts>
 #include <iostream>
 
 using std::sqrt;
 
+template<typename T, typename S>
+concept Number = (std::integral<T> || std::floating_point<T>) && (std::integral<S> || std::floating_point<S>);
+
 template <typename T = double>
 requires std::integral<T> || std::floating_point<T>
 class vec3 {
 public:
-  T e[3];
+  T e[3]; // Three elements
   vec3() : e{0,0,0} {}
   vec3(T e0, T e1, T e2) : e{e0, e1, e2}{}
 
@@ -21,6 +25,30 @@ public:
   auto operator-() const -> vec3 { return vec3(-e[0], -e[1], -e[2]); }
   auto operator[](int i) const -> T { return e[i]; }
   auto operator[](int i) -> T& { return e[i]; }
+
+  operator vec3<float>() const {
+    vec3<float> f;
+    f.e[0] = static_cast<float>(e[0]);
+    f.e[1] = static_cast<float>(e[1]);
+    f.e[2] = static_cast<float>(e[2]);
+    return f;
+  }
+  
+  operator vec3<int>() const {
+    vec3<int> i;
+    i.e[0] = static_cast<float>(e[0]);
+    i.e[1] = static_cast<float>(e[1]);
+    i.e[2] = static_cast<float>(e[2]);
+    return i;
+  }
+
+  operator vec3<double>() const {
+    vec3<double> d;
+    d.e[0] = static_cast<double>(e[0]);
+    d.e[1] = static_cast<double>(e[1]);
+    d.e[2] = static_cast<double>(e[2]);
+    return d;
+  }
 
   auto operator+=(const vec3& v) -> vec3& {
     e[0] += v.e[0];
@@ -56,4 +84,16 @@ using point3 = vec3<T>;
 template<typename T>
 inline std::ostream& operator<<(std::ostream& out, const vec3<T>& v) {
   return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
+}
+
+template<typename T, typename S>
+requires Number<T, S>
+inline auto operator+(const vec3<T>& u, const vec3<S>& v) {
+  return vec3(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);
+}
+
+template<typename T, typename S>
+requires Number<T, S>
+inline auto operator-(const vec3<T>& u, const vec3<S>& v) {
+  return vec3(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]);
 }
