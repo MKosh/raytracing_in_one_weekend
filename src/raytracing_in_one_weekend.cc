@@ -8,9 +8,9 @@ int main() {
 
   std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-  vec3<float> v1 = {1.0, 2.0, 3.0};
+  vec3<float> v1 = {1.1, 2.2, 3.3};
   std::cout << "v1 = " << v1 << '\n';
-  vec3<double> v2 = {4.0, 5.0, 6.0};
+  vec3<double> v2 = {4.4, 5.5, 6.6};
   std::cout << "v2 = " << v2 << '\n';
   vec3 v3 = v1 + v2;
   std::cout << "v3 = " << v3 << '\n';
@@ -30,8 +30,10 @@ int main() {
   auto v9 = v7 + v8;
   std::cout << "v9 = " << v9 << '\n';
 
-  vec3<double> v10 = v7 + v7;
-  std::cout << "v10 = " << v10 << '\n';
+  vec3<double> v10 = v7 + v6;
+  std::cout << "v10 = " << static_cast<vec3<int>>(v10) << '\n';
+
+  std::cout << "v10 but float = " << static_cast<vec3<float>>(v10) << '\n';
 
   for (int j = 0; j < image_height; ++j) {
     std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;

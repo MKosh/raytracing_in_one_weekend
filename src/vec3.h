@@ -8,10 +8,16 @@
 using std::sqrt;
 
 template<typename T, typename S>
-concept Number = (std::integral<T> || std::floating_point<T>) && (std::integral<S> || std::floating_point<S>);
+concept numerals= (std::integral<T> || std::floating_point<T>) && (std::integral<S> || std::floating_point<S>);
+
+template<typename T>
+concept numeric = (std::integral<T> || std::floating_point<T>);
+
+// template<typename T, typename S>
+// concept numeric_and_float = (std::integral<T> || std::floating_point<T>) && (std::floating_point<S>); 
 
 template <typename T = double>
-requires std::integral<T> || std::floating_point<T>
+requires numeric<T>
 class vec3 {
 public:
   T e[3]; // Three elements
@@ -87,13 +93,59 @@ inline std::ostream& operator<<(std::ostream& out, const vec3<T>& v) {
 }
 
 template<typename T, typename S>
-requires Number<T, S>
+requires numerals<T, S>
 inline auto operator+(const vec3<T>& u, const vec3<S>& v) {
   return vec3(u.e[0] + v.e[0], u.e[1] + v.e[1], u.e[2] + v.e[2]);
 }
 
 template<typename T, typename S>
-requires Number<T, S>
+requires numerals<T, S>
 inline auto operator-(const vec3<T>& u, const vec3<S>& v) {
   return vec3(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]);
+}
+
+template<typename T, typename S>
+requires numerals<T, S>
+inline auto operator*(const vec3<T>& u, const vec3<S>& v) {
+  return vec3(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]);
+}
+
+template<typename T, typename S>
+requires numerals<T, S>
+inline auto operator*(const vec3<T>& u, S s) {
+  return vec3(u.e[0] * s, u.e[1] * s, u.e[2] * s);
+}
+
+template<typename T, typename S>
+requires numerals<T, S>
+inline auto operator*(S s, const vec3<T>& u) {
+  return u * s;
+}
+
+template<typename T, typename S>
+requires numerals<T, S>
+inline auto operator/(const vec3<T>& u, S s) {
+  return (1.0/s) * u;
+}
+
+template<typename T, typename S>
+requires numerals<T, S>
+inline auto dot(const vec3<T>& u, const vec3<S>& v) {
+  return (u.e[0] * v.e[0] +
+          u.e[1] * v.e[1] +
+          u.e[2] * v.e[2]);
+}
+
+template<typename T, typename S>
+requires numerals<T, S>
+inline auto cross(const vec3<T>& u, const vec3<S>& v) {
+  return vec3(u.e[1] * v.e[2] - u.e[2] * v.e[1],
+              u.e[2] * v.e[0] - u.e[0] * v.e[2],
+              u.e[0] * v.e[1] - u.e[1] * v.e[0]);
+}
+
+template<typename T>
+requires numeric<T>
+inline auto unit_vector(const vec3<T> v) {
+  return v/v.length();
 }
