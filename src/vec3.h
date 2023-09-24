@@ -84,8 +84,7 @@ public:
 
 };
 
-template<typename T>
-using point3 = vec3<T>;
+using point3 = vec3<double>;
 
 template<typename T>
 inline std::ostream& operator<<(std::ostream& out, const vec3<T>& v) {

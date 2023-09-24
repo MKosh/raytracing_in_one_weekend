@@ -2,22 +2,22 @@
 
 #include "vec3.h"
 
-template<typename T>
-requires numeric<T>
+// template<typename T>
+// requires numeric<T>
 class ray {
 public:
   ray() {}
 
-  ray(const point3<T>& origin, const vec3<T>& direction) : orig(origin), dir(direction) {}
+  ray(const point3& origin, const vec3<double>& direction) : orig(origin), dir(direction) {}
 
-  auto origin() const -> point3<T> { return orig; }
-  auto direction() const -> vec3<T> { return dir; }
+  auto origin() const -> point3 { return orig; }
+  auto direction() const -> vec3<double> { return dir; }
 
-  auto at(T t) const -> point3<T> {
+  auto at(double t) const -> point3 {
     return orig + t * dir;
   }
 
 private:
-  point3<T> orig;
-  vec3<T> dir;
+  point3 orig;
+  vec3<double> dir;
 };
