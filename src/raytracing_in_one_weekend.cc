@@ -1,28 +1,30 @@
 #include <iostream>
 #include <string>
+
+#include "rtweekend.h"
 #include "color.h"
-#include "ray.h"
-#include "vec3.h"
+#include "hittable.h"
+#include "hittable_list.h"
+#include "sphere.h"
 
-auto hit_sphere(const point3& center, double radius, const ray& r) -> double {
-  vec3<double> oc = r.origin() - center;
-  auto a = r.direction().length_squared();
-  auto half_b = dot(oc, r.direction());
-  auto c = oc.length_squared() - radius * radius;
-  auto discriminant = half_b * half_b - a * c;
+// auto hit_sphere(const point3& center, double radius, const ray& r) -> double {
+//   vec3<double> oc = r.origin() - center;
+//   auto a = r.direction().length_squared();
+//   auto half_b = dot(oc, r.direction());
+//   auto c = oc.length_squared() - radius * radius;
+//   auto discriminant = half_b * half_b - a * c;
+//
+//   if (discriminant < 0) {
+//     return -1.0;
+//   } else {
+//     return (-half_b - sqrt(discriminant)) / a;
+//   }
+// }
 
-  if (discriminant < 0) {
-    return -1.0;
-  } else {
-    return (-half_b - sqrt(discriminant)) / a;
-  }
-}
-
-auto ray_color(const ray& r) {
-  auto t = hit_sphere(point3(0,0,-1), 0.5, r);
-  if (t > 0.0) {
-    vec3<double> N = unit_vector(r.at(t) - vec3{0.0, 0.0, -1.0});
-    return 0.5 * color(N.x()+1, N.y()+1, N.z()+1);
+auto ray_color(const ray& r, const hittable& world) -> color {
+  hit_record rec;
+  if (world.hit(r, interval(0, rt::infinity), rec)) {
+    return 0.5 * (rec.normal + color(1, 1, 1));
   }
 
   vec3<double> unit_direction = unit_vector(r.direction());
@@ -40,6 +42,11 @@ int main() {
   // Calculate the image height and ensure it's at least 1
   int image_height = static_cast<int>(image_width / aspect_ratio);
   image_height = (image_height < 1) ? 1 : image_height;
+
+  // World
+  hittable_list world;
+  world.add(make_shared<sphere>(point3(0,0,-1), 0.5));
+  world.add(make_shared<sphere>(point3(0,-100.5,-1), 100));
 
   // Camera
   auto focal_length = 1.0;
@@ -70,7 +77,7 @@ int main() {
       auto ray_direction = pixel_center - camera_center;
       ray r{camera_center, ray_direction};
 
-      color pixel_color = ray_color(r);
+      color pixel_color = ray_color(r, world);
       write_color(std::cout, pixel_color);
     }
   }
