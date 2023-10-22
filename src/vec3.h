@@ -1,6 +1,7 @@
 #pragma once
 
 // #include <__concepts/arithmetic.h>
+#include "rtweekend.h"
 #include <cmath>
 #include <concepts>
 #include <iostream>
@@ -82,6 +83,20 @@ public:
     return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
   }
 
+  static auto random() -> vec3<T> {
+    return vec3(rt::random_double(), rt::random_double(), rt::random_double());
+  }
+
+  static auto random(double min, double max) -> vec3<T> {
+    return vec3(rt::random_double(min,max), rt::random_double(min,max), rt::random_double(min,max));
+  }
+
+  auto near_zero() const -> bool {
+    // Return true if the vector is close to zero in all dimensions
+    auto s = 1e-18;
+    return (std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) < s);
+  }
+
 };
 
 using point3 = vec3<double>;
@@ -103,9 +118,13 @@ inline auto operator-(const vec3<T>& u, const vec3<S>& v) {
   return vec3(u.e[0] - v.e[0], u.e[1] - v.e[1], u.e[2] - v.e[2]);
 }
 
-template<typename T, typename S>
-requires numerals<T, S>
-inline auto operator*(const vec3<T>& u, const vec3<S>& v) {
+/* template<typename T, typename S> */
+/* requires numerals<T, S> */
+/* inline auto operator*(const vec3<T>& u, const vec3<S>& v) { */
+/*   return vec3(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]); */
+/* } */
+
+inline auto operator*(const auto& u, const auto& v) {
   return vec3(u.e[0] * v.e[0], u.e[1] * v.e[1], u.e[2] * v.e[2]);
 }
 
@@ -147,4 +166,56 @@ template<typename T>
 requires numeric<T>
 inline auto unit_vector(const vec3<T> v) {
   return v/v.length();
+}
+
+template<typename T>
+requires numeric<T>
+inline auto random_in_unit_sphere() {
+  while (true) {
+    auto p = vec3<T>::random(-1,1);
+    if (p.length_squared() < 1)
+      return p;
+  }
+}
+
+template<typename T>
+requires numeric<T>
+inline auto random_unit_vector() -> vec3<T> {
+  return unit_vector(random_in_unit_sphere<T>());
+}
+
+template<typename T>
+requires numeric<T>
+inline auto random_on_hemisphere(const vec3<T> normal) {
+  vec3<T> on_unit_sphere = random_unit_vector<T>();
+  if (dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+    return on_unit_sphere;
+  else
+    return -on_unit_sphere;
+}
+
+/* template<typename T> */
+/* requires numeric<T> */
+/* inline auto reflect(const vec3<T>& v, const vec3<T>& n) { */
+/*   return v - 2 * dot(v, n)*n; */
+/* } */
+
+inline auto reflect(const auto& v, const auto& n) {
+  return v - 2 * dot(v, n)*n;
+}
+
+inline auto refract(auto uv, auto n, auto etai_over_etat) {
+  auto cos_theta = std::fmin(dot(-uv, n), 1.0);
+  vec3<double> r_out_perp = etai_over_etat * (uv + cos_theta*n);
+  vec3<double> r_out_parallel = - sqrt(std::fabs(1.0 - r_out_perp.length_squared())) * n;
+  return r_out_perp + r_out_parallel;
+}
+
+inline auto random_in_unit_disk() {
+  while (true) {
+    auto p = vec3<double>(rt::random_double(-1,1), rt::random_double(-1,1), 0);
+    if (p.length_squared() < 1 ) {
+      return p;
+    }
+  }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rtweekend.h"
+
 class interval {
 public:
   double min, max;
@@ -15,6 +16,12 @@ public:
 
   auto surrounds(double x) const -> bool {
     return min < x && x < max;
+  }
+
+  auto clamp(double x) const -> double {
+    if (x < min) return min;
+    if (x > max) return max;
+    return x;
   }
 
   static const interval empty, universe;
